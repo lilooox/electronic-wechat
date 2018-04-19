@@ -94,6 +94,15 @@ class ElectronicWeChat {
       console.log(message);
     });
 
+    ipcMain.on('mdWorklogs', (event, message) => {
+      if (this.wechatWindow == null) {
+        console.log('>>> this.wechatWindow == null');
+      } else {
+        //console.log('====> ' + this.wechatWindow.webContents);
+        this.wechatWindow.mdWorklogs();
+      }
+    });
+
     ipcMain.on('reload', (event, repetitive) => {
       if (repetitive) {
         this.wechatWindow.loginState.current = this.wechatWindow.loginState.NULL;

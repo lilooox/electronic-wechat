@@ -121,6 +121,16 @@ class MenuHandler {
         ],
       },
       {
+        label: '工作日志',
+        submenu:[
+          {
+            label: '来自明道',
+            accelerator: 'Command+`',
+            click: MenuHandler._mdWorklogs
+          }
+        ]
+      },
+      {
         label: Common.MENU.view,
         submenu: [
           {
@@ -255,6 +265,10 @@ class MenuHandler {
     } else if (platform === 'linux') {
       return linuxTemplate;
     }
+  }
+
+  static _mdWorklogs() {
+    ipcRenderer.send('mdWorklogs');
   }
 
   static _quitApp() {
