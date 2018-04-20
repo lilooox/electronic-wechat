@@ -35,8 +35,8 @@ git clone https://github.com/geeeeeeeeek/electronic-wechat.git
 # Go into the repository
 cd electronic-wechat
 # Install dependencies and run the app
-<b>npm install -g cnpm --registry=https://registry.npm.taobao.org</b>
-<b>cnpm install && cnpm start</b>
+npm install -g cnpm --registry=https://registry.npm.taobao.org
+cnpm install && cnpm start
 ```
 
 To pack into an app, simply type one of these:
