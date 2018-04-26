@@ -125,7 +125,7 @@ class MenuHandler {
         submenu:[
           {
             label: '来自明道',
-            accelerator: 'Command+`',
+            accelerator: 'Ctrl+`',
             click: MenuHandler._mdWorklogs
           }
         ]
@@ -196,6 +196,16 @@ class MenuHandler {
     ];
     const linuxTemplate = [
       {
+        label: '工作日志',
+        submenu:[
+          {
+            label: '来自明道',
+            accelerator: 'Ctrl+`',
+            click: MenuHandler._mdWorklogs
+          }
+        ]
+      },
+      {
         label: Common.MENU.window,
         submenu: [
           {
@@ -264,11 +274,22 @@ class MenuHandler {
       return darwinTemplate;
     } else if (platform === 'linux') {
       return linuxTemplate;
+    } else {
+      return [{
+        label: '工作日志',
+        submenu:[
+          {
+            label: '来自明道',
+            accelerator: 'Ctrl+`',
+            click: MenuHandler._mdWorklogs
+          }
+        ]
+      }];
     }
   }
 
   static _mdWorklogs() {
-    ipcRenderer.send('mdWorklogs');
+    ipcRenderer.send('mdWorklogsSettings');
   }
 
   static _quitApp() {

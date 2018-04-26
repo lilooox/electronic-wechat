@@ -99,16 +99,59 @@ class WeChatWindow {
   }
 
 
-  mdWorklogs(){
-    var startDate = new Date();
-    var endDate = new Date(startDate.valueOf() + 2 * 24 * 60 * 60 * 1000);
+  mdLogin(){
+    var data = {
+        'account': AppConfig.readSettings('mingdao-username'),
+        'password': AppConfig.readSettings('mingdao-password'),
+        'verifyCode': '',
+        'isCookie': true
+    }
+    var xx = this;
+    var formData = querystring.stringify(data);
+    var contentLength = formData.length;
+
+    var options = {
+      headers: {
+        'Content-Length': contentLength,
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      url: 'https://www.mingdao.com/ajaxpage/AjaxHeader.ashx?controller=Login&action=MDAccountLogin',
+      method: 'POST',
+      body: formData
+    };
+
+    function callback(error, response, data) {
+      console.log('>>>>>>: ' + error + '\n' + response + '\n' + data);
+
+      if (!error && response.statusCode == 200) {
+        console.log('----info------',data);
+        var json = JSON.parse(data);
+        var sessionId = json.data.sessionId;
+        var memberId = json.data.accountId;
+        var cookie = 'md_pss_id=' + sessionId;
+        xx.mdWorklogs(cookie, memberId);
+      }
+    } 
+
+    request(options, callback);
+  }
+
+  mdWorklogs(cookie, memberId){
+    var startDate = new Date(AppConfig.readSettings('mingdao-today'));
+    var tomorrow = AppConfig.readSettings('mingdao-tomorrow');
+    var days = 2;
+    if (tomorrow == 'monday'){
+      var n = startDate.getDay();
+      if (n > 1) days = 8 - n + 1;
+    }
+    var endDate = new Date(startDate.valueOf() + days * 24 * 60 * 60 * 1000);
     //var s = dateFormat(startDate, "yyyy-mm-dd") + " - " + dateFormat(endDate, "yyyy-mm-dd");
     var data = {
         "isWorkCalendar": "true",
         "isTaskCalendar": "true",
         "filterTaskType": "2",
         "categoryIDs": "All",
-        "memberIDs": "8b11c703-b2e7-457a-9752-9d4a6077920b",
+        "memberIDs": memberId, //"8b11c703-b2e7-457a-9752-9d4a6077920b",
         "startDate": dateFormat(startDate, "yyyy-mm-dd"),
         "endDate": dateFormat(endDate, "yyyy-mm-dd")
     }
@@ -120,7 +163,7 @@ class WeChatWindow {
       headers: {
         'Content-Length': contentLength,
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Cookie': 'gr_cs1_fc3da78f-2a69-4e88-ae3c-f3554a348802=user_id%3A8b11c703-b2e7-457a-9752-9d4a6077920b; gr_session_id_b5122f5cd903be65=fc3da78f-2a69-4e88-ae3c-f3554a348802; Hm_lpvt_7fa03e3bcf838dc769842176503c5c5b=1523539383; Hm_lvt_7fa03e3bcf838dc769842176503c5c5b=1522843774,1523234533,1523325274,1523539383; tpStatistic=1; md_pss_id=CE7101CF0DB83417D7B1E4D9447DB8F; md_route=c403aa5352b7f7ff465b9aae5ebd5a4d; md_s_id=cdlfmwfalbiizjnhepv3w2jo; __hstc=117017817.64ade9afe8562679988034db1a2b9289.1522671231556.1522671231556.1522671231556.1; hubspotutk=64ade9afe8562679988034db1a2b9289; messagesUtk=b9f0233f250743b59b610f990bcb2dae; _ga=GA1.2.1984145339.1488784879; lastView=agendaDay; i18n.langtag=zh-Hans; foldedProjects_8b11c703-b2e7-457a-9752-9d4a6077920b_feed=048e2c9e-9ae6-4089-8f8e-8464e7f2dbcd%2C; fs_uid=www.fullstory.com`219ZY`5172547914039296:5629499534213120`8b11c703-b2e7-457a-9752-9d4a6077920b`; LoginName=+8613207169452; mdAutoLogin=accountId=8b11c703-b2e7-457a-9752-9d4a6077920b&password=ED30C5D75CC036D53AAF269E356AFE36; gr_user_id=8d0430f8-451a-4b90-bb10-7e7366a58705'
+        'Cookie': cookie //'i18n.langtag=zh-Hans; gr_user_id=4aa35485-e1f4-4259-813f-fa061f8e8a56; _ga=GA1.2.6248114.1522833926; messagesUtk=d6271df3f739433b93a41d66c807d0d5; hubspotutk=8c8f815492c04af250b98eca8a3164b6; LoginName=+8613207169452; lastView=agendaDay; mdAutoLogin=accountId=8b11c703-b2e7-457a-9752-9d4a6077920b&password=ED30C5D75CC036D53AAF269E356AFE36; md_route=c8c2ff8deb5c89112522547c9109a331; md_s_id=dquvbpiw5z5eivqxrp2kmedi; md_pss_id=AB6F396375C8F4B4AF2B06E22664444; Hm_lvt_7fa03e3bcf838dc769842176503c5c5b=1522833926,1523539689,1523836592; __hssrc=1; _gid=GA1.2.370128181.1524122702; io=r51u9eSphYqwVMNnAAg6; tpStatistic=1; _gat=1; gr_session_id_b5122f5cd903be65=f7b693b5-c09c-4432-b97b-232ed05bc1d3; gr_cs1_f7b693b5-c09c-4432-b97b-232ed05bc1d3=user_id%3A8b11c703-b2e7-457a-9752-9d4a6077920b; __hstc=117017817.8c8f815492c04af250b98eca8a3164b6.1522833927156.1524182220771.1524184612569.9; Hm_lpvt_7fa03e3bcf838dc769842176503c5c5b=1524184644; __hssc=117017817.2.1524184612569'
       },
       url: 'https://www.mingdao.com/ajaxpage/AjaxHeader.ashx?controller=Calendar&action=GetCalendars',
       method: 'POST',
@@ -176,13 +219,16 @@ class WeChatWindow {
           worklog += '太懒了，今天还没有写日志';
         }
 
-        var cs = getCalendarsByDate(items, startDate.valueOf() + 1 * 24 * 60 * 60 * 1000);
-        worklog += '\\n明日计划:\\n';
-        for(var idx in cs){
-          worklog += cs[idx] + '\\n';
-        }
-        if (cs.length == 0){
-          worklog += '绞尽脑汁，还没有想出明日计划';
+        if (tomorrow != 'none'){
+          var cs = getCalendarsByDate(items, startDate.valueOf() + (days - 1) * 24 * 60 * 60 * 1000);
+          var name = days == 2 ? '明日':'下周一';
+          worklog += '\\n\\n' + name +'计划:\\n';
+          for(var idx in cs){
+            worklog += cs[idx] + '\\n';
+          }
+          if (cs.length == 0){
+            worklog += '绞尽脑汁，还没有想出' + name + '计划';
+          }
         }
 
         /*

@@ -9,7 +9,8 @@ const AppConfig = require('./configuration');
 
 const SplashWindow = require('./windows/controllers/splash');
 const WeChatWindow = require('./windows/controllers/wechat');
-const SettingsWindow = require('./windows/controllers/settings')
+const SettingsWindow = require('./windows/controllers/settings');
+const MingdaoWindow = require('./windows/controllers/mingdao');
 const AppTray = require('./windows/controllers/app_tray');
 
 class ElectronicWeChat {
@@ -17,6 +18,7 @@ class ElectronicWeChat {
     this.wechatWindow = null;
     this.splashWindow = null;
     this.settingsWindow = null;
+    this.mingdaoWindow = null;
     this.tray = null;
   }
 
@@ -40,6 +42,9 @@ class ElectronicWeChat {
       }
       if(this.settingsWindow && this.settingsWindow.isShown){
         this.settingsWindow.show();
+      }
+      if(this.mingdaoWindow && this.mingdaoWindow.isShown){
+        this.mingdaoWindow.show();
       }
     });
 
@@ -94,12 +99,29 @@ class ElectronicWeChat {
       console.log(message);
     });
 
-    ipcMain.on('mdWorklogs', (event, message) => {
+    ipcMain.on('mdWorklogsSettings', (event, message) => {
+      if (this.mingdaoWindow) {
+        this.mingdaoWindow.show();
+      } else {
+        this.createMingdaoWindow();
+        this.mingdaoWindow.show();
+      }
+      // if (this.wechatWindow == null) {
+      //   console.log('>>> this.wechatWindow == null');
+      // } else {
+      //   //console.log('====> ' + this.wechatWindow.webContents);
+      //   this.wechatWindow.mdWorklogs();
+      // }
+    });
+
+    ipcMain.on('mdWorklogsCollect', (event, message) => {
+      console.log('====> mdWorklogsCollect');
       if (this.wechatWindow == null) {
         console.log('>>> this.wechatWindow == null');
       } else {
         //console.log('====> ' + this.wechatWindow.webContents);
-        this.wechatWindow.mdWorklogs();
+        //this.wechatWindow.mdWorklogs();
+        this.wechatWindow.mdLogin();
       }
     });
 
@@ -149,6 +171,9 @@ class ElectronicWeChat {
     this.settingsWindow = new SettingsWindow();
   }
 
+  createMingdaoWindow() {
+    this.mingdaoWindow = new MingdaoWindow();
+  }
 }
 
 new ElectronicWeChat().init();
