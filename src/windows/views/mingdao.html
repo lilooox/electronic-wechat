@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link href="../styles/settings.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>明道</title>
+</head>
+
+<body class="page">
+  <div class="setting-menu">
+    <section>
+      <ul>
+        <li class="menu-title">
+          <h3>明道账号</h3>
+        </li>
+        <li class="menu-desc">
+          <h4>输入你的明道账号</h4>
+        </li>
+        <li class="menu-button">
+          <input type="text" id="mingdao-username" placeholder="用户名">
+        </li>
+        <li class="menu-button">
+          <input type="password" id="mingdao-password" placeholder="密码">
+        </li>
+      </ul>
+    </section>
+    <section>
+      <ul>
+        <li class="menu-title">
+          <h3>日志采集</h3>
+        </li>
+        <li class="menu-desc">
+          <h4>今天</h4>
+        </li>
+        <li class="menu-button">
+          <input type="text" id="mingdao-today" placeholder="今天的日期">
+        </li>
+        <li class="menu-desc">
+          <h4>明日计划</h4>
+        </li>
+        <li class="menu-button">          
+          <select class="" id="mingdao-tomorrow">
+            <option value="none">无</option>
+            <option value="tomorrow">明天</option>
+            <option value="monday">下周一</option>
+          </select>
+        </li>
+      </ul>
+    </section>
+    <section>
+      <ul>
+        <li class="menu-button">
+          <input type="button" value="确定" onclick="closeWindow(true);">
+          <input type="button" value="取消" onclick="closeWindow(false);">
+        </li>
+      </ul>
+    </section>
+  </div>
+
+  <script>
+    const dateFormat = require('dateformat');
+    const AppConfig = require('../../configuration');
+    const {
+      remote,
+      shell,
+      ipcRenderer
+    } = require('electron');
+
+    const mingdaoUsername = AppConfig.readSettings('mingdao-username');
+    const mingdaoPassword = AppConfig.readSettings('mingdao-password');
+    const mingdaoToday = AppConfig.readSettings('mingdao-today');
+    const mingdaoTomorrow = AppConfig.readSettings('mingdao-tomorrow');
+
+    const mdUsername = $('mingdao-username');
+    const mdPassword = $('mingdao-password');
+    const mdToday = $('mingdao-today');
+    const mdTomorrow = $('mingdao-tomorrow');
+
+    function $(id) {
+      return document.getElementById(id);
+    }
+    
+    setConfig();
+    setListeners()
+
+    function setListeners() {
+      mdUsername.addEventListener('change', function() {
+        AppConfig.saveSettings('mingdao-username', mdUsername.value)
+      })
+      mdPassword.addEventListener('change', function() {
+        AppConfig.saveSettings('mingdao-password', mdPassword.value)
+      })
+      mdToday.addEventListener('change', function() {
+        AppConfig.saveSettings('mingdao-today', mdToday.value)
+      })
+      mdTomorrow.addEventListener('change', function() {
+        AppConfig.saveSettings('mingdao-tomorrow', mdTomorrow.value)
+      })
+    }
+
+    function setConfig() {
+      mdUsername.value = mingdaoUsername;
+      mdPassword.value = mingdaoPassword;
+      mdToday.value = dateFormat(new Date(), "yyyy/mm/dd");//mingdaoToday;
+      mdTomorrow.value = mingdaoTomorrow;
+    }
+
+    function closeWindow(isOK){
+      if (isOK){
+        gotoCollect();
+      }
+
+      var window = remote.getCurrentWindow();
+      window.close();  
+    }
+
+    function gotoCollect(){
+        AppConfig.saveSettings('mingdao-today', mdToday.value);
+        ipcRenderer.send('mdWorklogsCollect');      
+    }
+  </script>
+</body>
+
+</html>
